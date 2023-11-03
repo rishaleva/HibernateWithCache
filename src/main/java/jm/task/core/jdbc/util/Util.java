@@ -25,7 +25,10 @@ public class Util {
                 Properties properties = createProperties();
                 Configuration configuration = new Configuration();
 
-                configuration.addAnnotatedClass(User.class).setProperties(properties);
+                configuration.addAnnotatedClass(User.class).
+                        setProperties(properties);
+
+                configuration.addClass(("com.hibernate.tutorial.user.class");
 
                 ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                         .applySettings(configuration.getProperties()).build();
@@ -51,15 +54,15 @@ public class Util {
             return setting;
         }
 
-//    public static Connection getConnection() {
-//        Connection connection = null;
-//        try {
-//            Class.forName(DB_DRIVER);
-//            connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
-//            System.out.println("Conn OK");
-//        } catch (ClassNotFoundException | SQLException e) {
-//            System.out.println("Conn is not exist");
-//        }
-//        return connection;
-//    }
+    public static Connection getConnection() {
+        Connection connection = null;
+        try {
+            Class.forName(DB_DRIVER);
+            connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
+            System.out.println("Conn OK");
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Conn is not exist");
+        }
+        return connection;
+    }
 }
