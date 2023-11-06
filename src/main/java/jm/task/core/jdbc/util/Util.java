@@ -28,8 +28,6 @@ public class Util {
                 configuration.addAnnotatedClass(User.class).
                         setProperties(properties);
 
-                configuration.addClass(("com.hibernate.tutorial.user.class");
-
                 ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                         .applySettings(configuration.getProperties()).build();
 
