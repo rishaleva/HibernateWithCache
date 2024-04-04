@@ -2,6 +2,8 @@ package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -11,11 +13,13 @@ import java.util.List;
 public class UserDaoHibernateImpl implements UserDao {
     private final SessionFactory sessionFactory = Util.getSessionFactory();
     private Transaction transaction = null;
-    private final String sqlCreateTable = "CREATE TABLE IF NOT EXISTS user" +
-            "(id BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL, name VARCHAR(45), " +
-            "lastName VARCHAR(45), age TINYINT) ";
-    private final String sqlDropTable = "DROP TABLE IF EXISTS user";
-    private final String sqlCleanTable = "TRUNCATE TABLE user";
+    private final String sqlCreateTable = "CREATE TABLE IF NOT EXISTS \"user\"" +
+            "(id BIGSERIAL PRIMARY KEY NOT NULL, name VARCHAR(45), " +
+            "lastName VARCHAR(45), age SMALLINT) ";
+    private final String sqlDropTable = "DROP TABLE IF EXISTS \"user\"";
+    private final String sqlCleanTable = "TRUNCATE TABLE \"user\"";
+
+    private static final Logger logger = LogManager.getLogger(UserDaoHibernateImpl.class);
 
     @Override
     public void createUsersTable() {
@@ -25,9 +29,9 @@ public class UserDaoHibernateImpl implements UserDao {
             session.createSQLQuery(sqlCreateTable).addEntity(User.class).executeUpdate();
             transaction.commit();
 
-            System.out.println("Table was created");
+            logger.info("Table was created");
         } catch (Exception e) {
-            System.out.println("Table was NOT created");
+            logger.warn("Table was NOT created",e.getCause());
         }
     }
 
@@ -39,24 +43,25 @@ public class UserDaoHibernateImpl implements UserDao {
             session.createSQLQuery(sqlDropTable).addEntity(User.class).executeUpdate();
             transaction.commit();
 
-            System.out.println("Table was dropped");
+            logger.info("Table was dropped");
         } catch (Exception e) {
-            System.out.println("Table was NOT dropped");
+            logger.warn("Table was NOT dropped",e.getCause());
         }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        try (Session session = sessionFactory.openSession()) {
+        Transaction transaction = null;
 
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            User user = new User(name, lastName, age);
-            session.save(user);
+
+            session.save(new User(name,lastName,age));
             transaction.commit();
 
             System.out.println("User : " + name + " " + lastName + " " + age + " was saved");
         } catch (Exception e) {
-            System.out.println("User was NOT saved");
+            logger.warn("User was NOT saved", e.getCause());
             if (transaction != null) {
                 transaction.rollback();
             }
@@ -72,11 +77,11 @@ public class UserDaoHibernateImpl implements UserDao {
             session.delete(session.get(User.class, id));
             transaction.commit();
 
-            System.out.println("User with ID " + id + " was deleted ");
+            logger.info("User with ID " + id + " was deleted ");
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
-                System.out.println("User with ID was NOT deleted");
+                logger.warn("User with ID was NOT deleted", e.getCause());
             }
         }
     }
@@ -90,9 +95,9 @@ public class UserDaoHibernateImpl implements UserDao {
             userList = session.createQuery("from User", User.class).getResultList();
             transaction.commit();
 
-            System.out.println("Table was printed");
+            logger.info("Table was printed");
         } catch (Exception e) {
-            System.out.println("Table was NOT printed");
+            logger.warn("Table was NOT printed",e.getCause());
         }
         return userList;
     }
@@ -105,9 +110,9 @@ public class UserDaoHibernateImpl implements UserDao {
             session.createSQLQuery(sqlCleanTable).addEntity(User.class).executeUpdate();
             transaction.commit();
 
-            System.out.println("All users was deleted from database");
+            logger.info("All users was deleted from database");
         } catch (Exception e) {
-            System.out.println("users was NOT deleted from db");
+            logger.warn("users was NOT deleted from db", e.getCause());
         }
     }
 }
