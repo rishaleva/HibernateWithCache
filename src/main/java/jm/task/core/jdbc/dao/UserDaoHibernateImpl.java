@@ -79,9 +79,9 @@ public class UserDaoHibernateImpl implements UserDao {
 
             logger.info("User with ID " + id + " was deleted ");
         } catch (Exception e) {
+            logger.warn("User with ID was NOT deleted", e.getCause());
             if (transaction != null) {
                 transaction.rollback();
-                logger.warn("User with ID was NOT deleted", e.getCause());
             }
         }
     }
