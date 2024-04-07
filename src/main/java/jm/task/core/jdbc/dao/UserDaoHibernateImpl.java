@@ -31,7 +31,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
             logger.info("Table was created");
         } catch (Exception e) {
-            logger.warn("Table was NOT created",e.getCause());
+            logger.warn("Table was NOT created", e.getCause());
         }
     }
 
@@ -45,7 +45,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
             logger.info("Table was dropped");
         } catch (Exception e) {
-            logger.warn("Table was NOT dropped",e.getCause());
+            logger.warn("Table was NOT dropped", e.getCause());
         }
     }
 
@@ -55,11 +55,11 @@ public class UserDaoHibernateImpl implements UserDao {
 
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-
-            session.save(new User(name,lastName,age));
+            User user = new User(name, lastName, age);
+            session.save(user);
             transaction.commit();
 
-            System.out.println("User : " + name + " " + lastName + " " + age + " was saved");
+            logger.info("User: {} was saved", user);
         } catch (Exception e) {
             logger.warn("User was NOT saved", e.getCause());
             if (transaction != null) {
@@ -77,7 +77,7 @@ public class UserDaoHibernateImpl implements UserDao {
             session.delete(session.get(User.class, id));
             transaction.commit();
 
-            logger.info("User with ID " + id + " was deleted ");
+            logger.info("User with ID {} was deleted", id);
         } catch (Exception e) {
             logger.warn("User with ID was NOT deleted", e.getCause());
             if (transaction != null) {
@@ -97,7 +97,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
             logger.info("Table was printed");
         } catch (Exception e) {
-            logger.warn("Table was NOT printed",e.getCause());
+            logger.warn("Table was NOT printed", e.getCause());
         }
         return userList;
     }
