@@ -1,68 +1,71 @@
 package jm.task.core.jdbc.model;
 
-import lombok.Builder;
-import lombok.Data;
+
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.OptimisticLockType;
+import org.hibernate.annotations.OptimisticLocking;
 
 import javax.persistence.*;
+import org.hibernate.annotations.Cache;
 
 @Entity
-@Data
-@Table(name="\"user\"")
+@Getter
+@EqualsAndHashCode
+@Table(name = "\"user\"")
+@OptimisticLocking(type = OptimisticLockType.ALL)
+@DynamicUpdate
+@Access(value = AccessType.PROPERTY)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column
     private String name;
 
-    @Column
     private String lastName;
 
-    @Column
     private Byte age;
 
-    public User(String name, String lastName, Byte age) {
-        this.name = name;
-        this.lastName = lastName;
-        this.age = age;
-    }
+    @Embedded
+    private StudentAddress studentAddress;
+
+
 
     public User() {
     }
 
-
-    public Long getId() {
-        return id;
+    public User(String name, String lastName, Byte age, StudentAddress studentAddress) {
+        this.name = name;
+        this.lastName = lastName;
+        this.age = age;
+        this.studentAddress = studentAddress;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
 
-    public String getLastName() {
-        return lastName;
-    }
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
-    public Byte getAge() {
-        return age;
-    }
-
     public void setAge(Byte age) {
         this.age = age;
+    }
+
+    public void setStudentAddress(StudentAddress studentAddress) {
+        this.studentAddress = studentAddress;
     }
 
     @Override

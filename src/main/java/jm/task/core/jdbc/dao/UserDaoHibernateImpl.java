@@ -1,15 +1,15 @@
 package jm.task.core.jdbc.dao;
 
+import jm.task.core.jdbc.model.StudentAddress;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-
 import java.util.List;
-
 public class UserDaoHibernateImpl implements UserDao {
     private final SessionFactory sessionFactory = Util.getSessionFactory();
     private Transaction transaction = null;
@@ -50,12 +50,13 @@ public class UserDaoHibernateImpl implements UserDao {
     }
 
     @Override
-    public void saveUser(String name, String lastName, byte age) {
+    public void saveUser(String name, String lastName, byte age , StudentAddress studentAddress) {
         Transaction transaction = null;
 
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            User user = new User(name, lastName, age);
+            User user = new User(name, lastName, age , studentAddress );
+            user.setStudentAddress(studentAddress);
             session.save(user);
             transaction.commit();
 
@@ -113,6 +114,29 @@ public class UserDaoHibernateImpl implements UserDao {
             logger.info("All users was deleted from database");
         } catch (Exception e) {
             logger.warn("users was NOT deleted from db", e.getCause());
+        }
+    }
+
+    public void checkCache() {
+        try (Session session = sessionFactory.openSession()) {
+
+            transaction = session.beginTransaction();
+            User user = new User("test", "test", (byte) 10,new StudentAddress("test", "test", "test"));
+            session.save(user);
+            logger.info("SAVED");
+            transaction.commit();
+        } catch (Exception e) {
+            logger.warn("checkedCache", e.getCause());
+        }
+        try (Session session1 = sessionFactory.openSession()) {
+
+            transaction = session1.beginTransaction();
+           User user = session1.get(User.class, 1L);
+            user.setName("teSTICHE");
+            logger.info("CHANGED");
+            transaction.commit();
+        } catch (Exception e) {
+            logger.warn("checkedCache", e.getCause());
         }
     }
 }
